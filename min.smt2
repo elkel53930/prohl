@@ -1,0 +1,6 @@
+(declare-var x Int)
+(declare-var y Int)
+(declare-var z Int)
+(assert (not (=> true (and (=> (>= x y) (and (=> (>= x y) (= x x)) (=> (< x y) (= x y)))) (=> (not (>= x y)) (and (=> (>= x y) (= y x)) (=> (< x y) (= y y))))))))
+(check-sat)
+(get-model)

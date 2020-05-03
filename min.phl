@@ -1,0 +1,11 @@
+vars x y z
+{ true }
+if x >= y then
+    z := x
+else 
+    z := y
+fi
+{
+    (x >= y => z == x) &
+    (x <  y => z == y)
+}
