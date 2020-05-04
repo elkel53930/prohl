@@ -1,0 +1,11 @@
+vars x i A B
+{true}
+x := 0;
+i := 0;
+while !(i == A)
+inv x == i * B 
+do
+  x := x + B;
+  i := i + 1
+od
+{x == A * B}

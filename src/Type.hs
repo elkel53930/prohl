@@ -50,3 +50,11 @@ instance Show Statement where
     show (While cond inv stat) = concat ["while ", show cond, " inv ", show inv, " do " , show stat, " od"]
     show (Sequence s1 s2) = "(" ++ show s1 ++ " ; " ++ show s2 ++ ")"
 
+mkNot :: Expression -> Expression
+mkNot e = UnaryOp Not e
+
+mkBOp :: BinaryOperator -> Expression -> Expression -> Expression
+mkBOp op = BinaryOp op
+
+mkImp = mkBOp Imp
+mkAnd = mkBOp And

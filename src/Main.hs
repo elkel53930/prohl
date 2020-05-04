@@ -4,22 +4,40 @@ import Type
 import Parser
 import Wp
 import Smt
+import qualified System.Process as C
+import System.Environment (getArgs)
 
 main :: IO ()
 main = do
-    code <- readFile "min.phl"
-    let hoare = parseHoare code
-    putStrLn . show $ hoare
-    case hoare of
-        Right h@(Hoare dv _ _ _) ->do
-            putStrLn $ (declaresToSmt dv) ++ (assert . toSmt $ mkWpExpr h) ++ cmd
-        Left a -> putStrLn $ show a 
+    args <- getArgs
+    if length args == 0 then
+        putStrLn "no filename"
+    else do
+        code <- readFile $ head args
+        let hoare = parseHoare code
+        case hoare of
+            Right h@(Hoare dv _ _ _) ->do
+                mapM_ (z3 dv) $ mkWpExpr h
+            Left a -> putStrLn $ show a 
 
-mkWpExpr :: Hoare -> Expression
-mkWpExpr (Hoare _ pre prog post) =  mkNot . mkImp pre $ wp prog post
+mkWpExpr :: Hoare -> [Expression]
+mkWpExpr (Hoare _ pre prog post) = mkImp pre weak_pre : props'
+    where
+        (props', weak_pre) = wp [] prog post
 
-mkNot :: Expression -> Expression
-mkNot e = UnaryOp Not e
+z3 :: [DeclareVar] -> Expression -> IO()
+z3 dv prop = do
+    let smt2 = toSmt $ mkNot prop
+    putStrLn "\n = = = = = = = = = = =\n"
+    putStrLn smt2
 
-mkImp :: Expression -> Expression -> Expression
-mkImp e1 e2 = BinaryOp Imp e1 e2
+    writeFile "prohl.smt2" $ (declaresToSmt dv) ++ assert smt2 ++ cmd
+    C.system "z3 prohl.smt2 > prohl_res"
+    res <- readFile "prohl_res"
+    if "unsat" == (head $ lines res) then
+        putStrLn "===> OK"
+    else
+        do
+            C.system "cat prohl_res"
+            return ()
+

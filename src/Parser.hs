@@ -189,8 +189,9 @@ withUnary = do
 
 quantifier :: Parser Expression
 quantifier = do
-    q <- choice [symbol "ALL.", symbol "EX."]
+    q <- choice [symbol "ALL", symbol "EX"]
     v <- iden
+    symbol "."
     e <- expression
     let f = if q == "ALL." then ALL else EX
     return $ Quantifier f v e

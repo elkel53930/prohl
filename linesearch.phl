@@ -1,0 +1,15 @@
+vars x n i v[]
+{
+  n >= 0
+}
+i := 0;
+while i < n & !(v[i] == x)
+inv 0 <= i & i <= n & ALL j. 0 <= j & j < i => !(v[j] == x)
+do
+  i := i + 1
+od
+{
+  0 <= i & i <= n
+  & (ALL j. 0 <= j & j < i => !(v[j] == x))
+  & (i < n => v[i] == x)
+}
