@@ -24,6 +24,7 @@ toSmt (Boolean b) = if b then "true" else "false"
 toSmt (Variable v) = v
 toSmt (Select v e) = [i|(select #{v} #{toSmt e})|]
 toSmt (Store v e1 e2) = [i|(store #{v} #{toSmt e1} #{toSmt e2})|]
+toSmt (BinaryOp Neq e1 e2) = [i|(not (= #{toSmt e1} #{toSmt e2}))|]
 toSmt (BinaryOp op e1 e2) = [i|(#{bopToSmt op} #{toSmt e1} #{toSmt e2})|]
 toSmt (UnaryOp Minus e) = [i|(- 0 #{toSmt e})|]
 toSmt (UnaryOp Not e) = [i|(not #{toSmt e})|]

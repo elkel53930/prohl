@@ -2,7 +2,7 @@ module Type where
 
 data Quant = ALL | EX deriving (Show, Eq)
 data BinaryOperator = Mul | Div | Mod | Add | Sub
-                    | Le | Lt | Ge | Gt | Eq
+                    | Le | Lt | Ge | Gt | Eq | Neq
                     | And | Or | Imp deriving (Eq, Ord, Show)
 data UnaryOperator = Minus | Not deriving (Eq, Ord, Show)
 type Var = String
