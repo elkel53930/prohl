@@ -32,6 +32,7 @@ subst expr v e = case expr of
     Number _ -> expr
     Boolean _ -> expr
     Variable v' -> if v'==v then e else (Variable v')
+    Function1 f e' -> Function1 f (subst e' v e)
     Select v' e' -> Select (spud $ subst (Variable v') v e) (subst e' v e)
     Store v' e1 e2 -> Store (spud $ subst (Variable v') v e) (subst e1 v e) (subst e2 v e)
     BinaryOp op e1 e2 -> BinaryOp op (subst e1 v e) (subst e2 v e)

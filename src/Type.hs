@@ -5,11 +5,13 @@ data BinaryOperator = Mul | Div | Mod | Add | Sub
                     | Le | Lt | Ge | Gt | Eq | Neq
                     | And | Or | Imp deriving (Eq, Ord, Show)
 data UnaryOperator = Minus | Not deriving (Eq, Ord, Show)
+data Function = ToInt | ToReal deriving(Eq, Ord, Show)
+
 type Var = String
 
 data Hoare = Hoare [DeclareVar] Expression Statement Expression -- Hoare triple
 
-data DeclareVar = SimpleVar Var | ArrayVar Var deriving Show
+data DeclareVar = IntVar Var | RealVar Var | ArrayVar Var deriving Show
 
 data Statement = Skip -- skip
                | Assign Var Expression -- var := expr
@@ -18,9 +20,10 @@ data Statement = Skip -- skip
                | While Expression Expression Statement -- while expr inv expr do statement od
                | Sequence Statement Statement  -- statement ; statement
 
-data Expression = Number Int
+data Expression = Number String
                 | Boolean Bool
                 | Variable Var
+                | Function1 Function Expression
                 | Select Var Expression
                 | Store Var Expression Expression
                 | Quantifier Quant Var Expression
@@ -32,9 +35,10 @@ instance Show Hoare where
     show (Hoare dv pre prog post) = show dv ++ " { " ++ show pre ++ " } " ++ show prog ++ "{ " ++ show post ++ " }"
 
 instance Show Expression where
-    show (Number a) = show a
+    show (Number a) = a
     show (Boolean b) = show b
     show (Variable v) = v
+    show (Function1 f e) = show f ++ "(" ++ show e ++ ")"
     show (Select v index) = v ++ "[" ++ show index ++ "]"
     show (Store v index e) = v ++ "[" ++ show index ++ " := " ++ show e ++ "]"
     show (Quantifier q v e) = "(" ++ show q ++ "." ++ v ++ " " ++ show e ++ ")"

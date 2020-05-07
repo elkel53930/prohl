@@ -8,6 +8,9 @@ import Text.Parsec.Combinator
 
 import Type
 
+funs1 = [ ("int", ToInt) -- functions that has 1 parameter.
+        , ("real", ToReal)]
+
 bops2 = [ ("*", Mul)
         , ("div", Div)
         , ("mod", Mod)
@@ -52,10 +55,11 @@ declares = do
     where
         declare = do
             i <- iden
-            array <- optionMaybe $ symbol "[]"
+            array <- optionMaybe $ choice [symbol "[]", symbol"."]
             case array of
-                Nothing -> return $ SimpleVar i
-                Just _ -> return $ ArrayVar i
+                Nothing -> return $ IntVar i
+                Just "[]" -> return $ ArrayVar i
+                Just "." -> return $ RealVar i
 
 statement :: Parser Statement
 statement = try skip
@@ -117,9 +121,15 @@ statements = statement `chainl1` seq
 
 number :: Parser Expression
 number = do
-    xs <- many1 digit
+    x <- many1 digit
+    d <- optionMaybe (do
+        char '.'
+        ds <- many digit
+        return $ '.' : ds)
     skipMany space
-    return . Number $ read xs
+    case d of
+        Nothing -> return $ Number x
+        Just demical -> return $ Number (x++demical)
 
 boolean :: Parser Expression
 boolean = do
@@ -132,6 +142,14 @@ variable :: Parser Expression
 variable = do
     v <- iden
     return $ Variable v
+
+function1 :: (String, Function) -> Parser Expression
+function1 (s,fun) = do
+    symbol s
+    symbol("(")
+    p <- expression
+    symbol(")")
+    return $ Function1 fun p
 
 select :: Parser Expression
 select = do
@@ -203,6 +221,7 @@ term = try paren
    <|> try boolean
    <|> try store
    <|> try select
+   <|> try ( choice $ map function1 funs1 )
    <|> try variable
    <|> withUnary
 
