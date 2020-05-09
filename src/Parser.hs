@@ -63,6 +63,7 @@ declares = do
 
 statement :: Parser Statement
 statement = try skip
+        <|> try abort
         <|> try if_
         <|> try while
         <|> try assign
@@ -72,6 +73,11 @@ skip :: Parser Statement
 skip = do
     symbol "skip"
     return Skip
+
+abort :: Parser Statement
+abort = do
+    symbol "abort"
+    return Abort
 
 assign :: Parser Statement
 assign = do

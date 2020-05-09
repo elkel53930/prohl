@@ -5,6 +5,7 @@ import Type
 wp :: [Expression] -> Statement -> Expression -> ([Expression], Expression)
 wp props s post = case s of
     Skip -> (props, post)
+    Abort -> (props, Boolean False)
     Assign v e -> (props, subst post v e)
     Update v i e -> (props, subst post v (Store v i e))
     If cond  t f -> 

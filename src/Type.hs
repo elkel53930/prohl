@@ -13,7 +13,8 @@ data Hoare = Hoare [DeclareVar] Expression Statement Expression -- Hoare triple
 
 data DeclareVar = IntVar Var | RealVar Var | ArrayVar Var deriving Show
 
-data Statement = Skip -- skip
+data Statement = Abort
+               | Skip
                | Assign Var Expression -- var := expr
                | Update Var Expression Expression -- var[expr] := expr
                | If Expression Statement Statement -- if expr then statement else statement fi
@@ -47,6 +48,7 @@ instance Show Expression where
     show (Paren a) = show a
 
 instance Show Statement where
+    show (Abort) = "abort"
     show (Skip) = "skip"
     show (Assign v e) = "(" ++ v ++ " := " ++ show e ++ ")"
     show (Update v index e) = v ++ "[" ++ show index ++ " := " ++ show e ++ "]"
