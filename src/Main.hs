@@ -29,7 +29,7 @@ z3 :: [DeclareVar] -> Expression -> IO()
 z3 dv prop = do
     let smt2 = toSmt $ mkNot prop
     putStrLn "\n = = = = = = = = = = =\n"
-    putStrLn smt2
+    putStrLn $ show prop
 
     writeFile "prohl.smt2" $ (declaresToSmt dv) ++ assert smt2 ++ cmd
     C.system "z3 prohl.smt2 > prohl_res"

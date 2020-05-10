@@ -3,8 +3,8 @@ module Type where
 data Quant = ALL | EX deriving (Show, Eq)
 data BinaryOperator = Mul | Div | Mod | Add | Sub
                     | Le | Lt | Ge | Gt | Eq | Neq
-                    | And | Or | Imp deriving (Eq, Ord, Show)
-data UnaryOperator = Minus | Not deriving (Eq, Ord, Show)
+                    | And | Or | Imp deriving (Eq, Ord)
+data UnaryOperator = Minus | Not deriving (Eq, Ord)
 data Function = ToInt | ToReal deriving(Eq, Ord, Show)
 
 type Var = String
@@ -44,7 +44,7 @@ instance Show Expression where
     show (Store v index e) = v ++ "[" ++ show index ++ " := " ++ show e ++ "]"
     show (Quantifier q v e) = "(" ++ show q ++ "." ++ v ++ " " ++ show e ++ ")"
     show (BinaryOp op a b) = concat ["(", show a, " ", show op, " ", show b, ")"]
-    show (UnaryOp op a) = (show op ++ " " ++ show a)
+    show (UnaryOp op a) = (show op ++ show a)
     show (Paren a) = show a
 
 instance Show Statement where
@@ -55,6 +55,26 @@ instance Show Statement where
     show (If cond t f) = concat ["if ", show cond, " then " ,show t, " else ", show f, " fi"]
     show (While cond inv stat) = concat ["while ", show cond, " inv ", show inv, " do " , show stat, " od"]
     show (Sequence s1 s2) = "(" ++ show s1 ++ " ; " ++ show s2 ++ ")"
+
+instance Show BinaryOperator where
+    show Mul = "*"
+    show Div = "div"
+    show Mod = "mod"
+    show Add = "+"
+    show Sub = "-"
+    show Le  = "<="
+    show Lt  = "<"
+    show Ge  = ">="
+    show Gt  = ">"
+    show Eq  = "=="
+    show Neq = "!="
+    show And = "&"
+    show Or  = "|"
+    show Imp = "=>"
+
+instance Show UnaryOperator where
+    show Minus = "-"
+    show Not = "!"
 
 mkNot :: Expression -> Expression
 mkNot e = UnaryOp Not e
