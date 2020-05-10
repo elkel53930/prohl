@@ -132,7 +132,7 @@ number = do
         char '.'
         ds <- many digit
         return $ '.' : ds)
-    skipMany space
+    skipSpace
     case d of
         Nothing -> return $ Number x
         Just demical -> return $ Number (x++demical)
@@ -178,14 +178,14 @@ store = do
 symbol :: String -> Parser String
 symbol s = do
     res <- string s
-    skipMany space
+    skipSpace
     return res
 
 iden :: Parser String
 iden = do
     hd <- letter <|> char '_'
     tl <- many (letter <|> char '_' <|> digit)
-    skipMany space
+    skipSpace
     return $ hd : tl
 
 paren :: Parser Expression
@@ -219,6 +219,26 @@ quantifier = do
     e <- expression
     let f = if q == "ALL." then ALL else EX
     return $ Quantifier f v e
+
+skipSpace :: Parser ()
+skipSpace = do
+    many $ sp <|> comment
+    return ()
+    where sp = do{space; return ()}
+
+comment :: Parser ()
+comment = do
+    string "/*"
+    commentEnd
+    where
+        commentEnd = try end <|> cmnt
+        end = do
+            string "*/"
+            return ()
+        cmnt = do
+            anyChar
+            commentEnd
+
 
 term :: Parser Expression
 term = try paren
