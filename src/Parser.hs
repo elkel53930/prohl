@@ -35,9 +35,18 @@ uops1 = [ ("-", Minus)
         , ("!", Not)
         ]
 
+procedure :: Parser Procedure
+procedure = do
+    symbol "proc"
+    name <- iden
+    symbol "("
+    vars <- declares
+    symbol ")"
+    h <- hoare
+    return $ Procedure name vars h
+
 hoare :: Parser Hoare
 hoare = do
-    vd <- declares
     symbol "{"
     pre <- expression
     symbol "}"
@@ -45,12 +54,11 @@ hoare = do
     symbol "{"
     post <- expression
     symbol "}"
-    return $ Hoare vd pre prog post
+    return $ Hoare pre prog post
 
 declares :: Parser [DeclareVar]
 declares = do
-    symbol "vars"
-    ds <- many1 $ try declare
+    ds <- many $ try declare
     return $ ds
     where
         declare = do
@@ -68,6 +76,7 @@ statement = try skip
         <|> try while
         <|> try assign
         <|> try update
+        <|> try procCall
 
 skip :: Parser Statement
 skip = do
@@ -156,6 +165,14 @@ function1 (s,fun) = do
     p <- expression
     symbol(")")
     return $ Function1 fun p
+
+procCall :: Parser Statement
+procCall = do
+    name <- iden
+    symbol "("
+    es <- many expression
+    symbol ")"
+    return $ ProcCall name es
 
 select :: Parser Expression
 select = do
@@ -259,4 +276,4 @@ expression = term `chainl1` (choice $ map (try . binary) bops2)
             `chainl1` (choice $ map (try . binary) bops6)
             `chainr1` (choice $ map (try . binary) bops7)
 
-parseHoare s = parse (hoare <* eof) s s
+parseProcedures sourceName source = parse ((many1 procedure) <* eof) sourceName source

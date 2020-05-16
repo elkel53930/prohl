@@ -13,15 +13,18 @@ main = do
     if length args == 0 then
         putStrLn "no filename"
     else do
-        code <- readFile $ head args
-        let hoare = parseHoare code
-        case hoare of
-            Right h@(Hoare dv _ _ _) ->do
+        let filename = head args
+        code <- readFile filename
+        let procs = parseProcedures filename code
+        case procs of
+            Right ps ->do
+                let p@(Procedure _ dv h) = head ps
+                putStrLn $ show p
                 mapM_ (z3 dv) $ mkWpExpr h
             Left a -> putStrLn $ show a 
 
 mkWpExpr :: Hoare -> [Expression]
-mkWpExpr (Hoare _ pre prog post) = mkImp pre weak_pre : props'
+mkWpExpr (Hoare pre prog post) = mkImp pre weak_pre : props'
     where
         (props', weak_pre) = wp [] prog post
 

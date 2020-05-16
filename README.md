@@ -1,2 +1,2 @@
 # prohl
-Prover with Hoare Logic
+Prover with Procedure Logic

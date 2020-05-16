@@ -45,3 +45,30 @@ subst expr v e = case expr of
         else
             Quantifier q (spud $ subst (Variable v') v e) (subst e' v e)
 
+mangling :: Procedure -> Procedure
+mangling (Procedure name dv (Hoare pre pro post)) = Procedure name (map mand dv) (Hoare (mane pre) (mans pro) (mane post))
+    where
+    manv v = '$' : name ++ v
+    mans stat = case stat of
+        Sequence s1 s2 -> Sequence (mans s1) (mans s2)
+        While e inv s -> While (mane e) (mane inv) (mans s)
+        If cond st sf -> If (mane cond) (mans st) (mans sf)
+        ProcCall p es -> ProcCall p (map mane es)
+        Update v e1 e2 -> Update (manv v) (mane e1) (mane e2)
+        Assign v e -> Assign (manv v) (mane e)
+        otherwise -> stat
+    mand dec = case dec of
+        IntVar v -> IntVar (manv v)
+        RealVar v -> RealVar (manv v)
+        ArrayVar v -> ArrayVar (manv v)
+    mane expr = case expr of
+        Variable v -> Variable (manv v)
+        Function1 f e -> Function1 f (mane e)
+        Select v e -> Select (manv v) (mane e)
+        Store v e1 e2 -> Store (manv v) (mane e1) (mane e2)
+        Quantifier q v e -> Quantifier q (manv v) (mane e)
+        BinaryOp op e1 e2 -> BinaryOp op (mane e1) (mane e2)
+        UnaryOp op e -> UnaryOp op (mane e)
+        Paren e -> Paren (mane e)
+        otherwise -> expr
+

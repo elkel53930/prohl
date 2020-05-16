@@ -1,5 +1,7 @@
 module Type where
 
+import Data.List
+
 data Quant = ALL | EX deriving (Show, Eq)
 data BinaryOperator = Mul | Div | Mod | Add | Sub
                     | Le | Lt | Ge | Gt | Eq | Neq
@@ -8,15 +10,20 @@ data UnaryOperator = Minus | Not deriving (Eq, Ord)
 data Function = ToInt | ToReal deriving(Eq, Ord, Show)
 
 type Var = String
+type Proc = String
 
-data Hoare = Hoare [DeclareVar] Expression Statement Expression -- Hoare triple
+data Procedure = Procedure Proc [DeclareVar] Hoare deriving Show
 
-data DeclareVar = IntVar Var | RealVar Var | ArrayVar Var deriving Show
+data Hoare = Hoare Expression Statement Expression -- Hoare triple
+
+data DeclareVar = IntVar Var | RealVar Var | ArrayVar  Var deriving Show
 
 data Statement = Abort
                | Skip
                | Assign Var Expression -- var := expr
                | Update Var Expression Expression -- var[expr] := expr
+               | ProcCall Proc [Expression]
+               | ProcCall' Procedure
                | If Expression Statement Statement -- if expr then statement else statement fi
                | While Expression Expression Statement -- while expr inv expr do statement od
                | Sequence Statement Statement  -- statement ; statement
@@ -33,7 +40,7 @@ data Expression = Number String
                 | Paren Expression
 
 instance Show Hoare where
-    show (Hoare dv pre prog post) = show dv ++ " { " ++ show pre ++ " } " ++ show prog ++ "{ " ++ show post ++ " }"
+    show (Hoare pre prog post) = " { " ++ show pre ++ " } " ++ show prog ++ "{ " ++ show post ++ " }"
 
 instance Show Expression where
     show (Number a) = a
@@ -52,6 +59,7 @@ instance Show Statement where
     show (Skip) = "skip"
     show (Assign v e) = "(" ++ v ++ " := " ++ show e ++ ")"
     show (Update v index e) = v ++ "[" ++ show index ++ " := " ++ show e ++ "]"
+    show (ProcCall n es) = n ++ "(" ++ concat (intersperse ", " (map show es)) ++  ")" 
     show (If cond t f) = concat ["if ", show cond, " then " ,show t, " else ", show f, " fi"]
     show (While cond inv stat) = concat ["while ", show cond, " inv ", show inv, " do " , show stat, " od"]
     show (Sequence s1 s2) = "(" ++ show s1 ++ " ; " ++ show s2 ++ ")"
