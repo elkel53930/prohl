@@ -39,7 +39,7 @@ prohl XXXX.phl
 Write variable declarations, preconditions, algorithm and postconditions.
 If you use loop, you must write loop invariant conditions.
 
-`isqrt.h`
+`isqrt.phl`
 ```
 vars x a b m	
 {	
