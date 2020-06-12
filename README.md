@@ -88,7 +88,7 @@ Then results will be displayed.
 ===> OK
 ```
 
-If the algorithm satisfies the conditions, all result are OK.
+If the algorithm satisfies the conditions, all result wil be OK.
 
 If the algorithm does not satisfy the conditions, prohl will show a counterexample.
 
